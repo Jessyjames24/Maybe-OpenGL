@@ -21,6 +21,9 @@
     <ClCompile Include="src\vendor\glad\gl.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\res\shaders\vertex.shader">
@@ -29,5 +32,12 @@
     <None Include="src\res\shaders\fragment.shader">
       <Filter>Fichiers de ressources</Filter>
     </None>
+    <None Include="res\shaders\fragment.shader" />
+    <None Include="res\shaders\vertex.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\headers\Shader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 //#include "linmath.h"
 
 #include "headers/Shader.h"
+#include "headers/Window.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -16,13 +17,6 @@ void ProcessInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-const char* fragmentShaderSource = "#version 460 core\n"
-	"out vec4 FragColor;\n"
-	"in vec3 ourColour;\n"
-	"void main(){\n"
-	"	FragColor = vec4(ourColour, 1.0);\n"
-	"}\n";
-
 
 float vertices[]
 {
@@ -33,34 +27,13 @@ float vertices[]
 
 unsigned int indices[] =
 {
-	0, 1, 2,
+	0, 1, 2
 };
 
 int main() {
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	Window window(800, 600, "Maybe OpenGL Indev 0.0");
 
-	const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
-
-	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Maybe OpenGL: InDev 0.0", NULL, NULL);
-	if (!window)
-	{
-		std::cout << "ERROR: Window creation was unsuccessful!\n";
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGL(glfwGetProcAddress))
-	{
-		std::cout << "ERROR: Unable to intialize GLAD\n";
-		return -1;
-	}
-
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+	glfwSetFramebufferSizeCallback(window.GetWindowID(), FramebufferSizeCallback);
 
 	glfwSwapInterval(1);
 
@@ -94,27 +67,24 @@ int main() {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * (sizeof(float))));
 	glEnableVertexAttribArray(1);
 	
-	while (!glfwWindowShouldClose(window))
+	Shader shader("res/shaders/vertex.shader", "res/shaders/fragment.shader");
+
+	while (!glfwWindowShouldClose(window.GetWindowID()))
 	{
-		ProcessInput(window);
+		ProcessInput(window.GetWindowID());
 
 		glClearColor(0.5f, 0.0f, 1.0f, 0.5f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
-		Shader shader("res/shaders/vertex.shader", "res/shaders/fragment.shader");
 
 		shader.Use();
-
-		shader.SetFloat("offset", 0.5f);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, (sizeof(indices) / (sizeof(int))), GL_UNSIGNED_INT, 0);
 		
 		glBindVertexArray(0);
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(window.GetWindowID());
 		glfwPollEvents();
 	}
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	
 }

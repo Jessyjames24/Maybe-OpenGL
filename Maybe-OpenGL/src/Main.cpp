@@ -1,3 +1,4 @@
+
 #include <iostream>
 
 #include "glad/gl.h"
@@ -6,6 +7,8 @@
 
 #include "headers/Shader.h"
 #include "headers/Window.h"
+
+static float xOffset, yOffset;
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -16,6 +19,14 @@ void ProcessInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		yOffset += 0.05f;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		xOffset += -0.05f;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		yOffset += -0.05f;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		xOffset += 0.05f;
 }
 
 float vertices[]
@@ -40,9 +51,9 @@ int main() {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	
-	/* 
-	* 
+
+	/*
+	*
 		Vertex Buffer Object: used for storing vertices in a buffer. The VBO is then going to be used by the shader to
 		understand how to draw (?)
 	*
@@ -51,7 +62,7 @@ int main() {
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
+
 	unsigned int EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -66,7 +77,7 @@ int main() {
 	// 3 floats for the colour of each vertex
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * (sizeof(float))));
 	glEnableVertexAttribArray(1);
-	
+
 	Shader shader("res/shaders/vertex.shader", "res/shaders/fragment.shader");
 
 	while (!glfwWindowShouldClose(window.GetWindowID()))
@@ -78,13 +89,16 @@ int main() {
 
 		shader.Use();
 
+		shader.SetFloat("xOffset", xOffset);
+		shader.SetFloat("yOffset", yOffset);
+
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, (sizeof(indices) / (sizeof(int))), GL_UNSIGNED_INT, 0);
-		
+
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window.GetWindowID());
 		glfwPollEvents();
 	}
-	
+
 }
